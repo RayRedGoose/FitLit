@@ -122,7 +122,7 @@ class Activity {
       const length = group.length
       const row = {period: `${group[0].date} - ${group[length - 1].date}`, streak: length };
       rows.push(row);
-      return rows.sort((a,b) => (a.streak > b.streak) ? 1 : -1);
+      return rows.sort((a, b) => (a.streak > b.streak) ? 1 : -1);
     }, [ ]);
     return streaks;
   }

@@ -5,25 +5,25 @@ const UserRepository = require('../src/UserRepository');
 const Sleep = require('../src/Sleep');
 const sleepData = require('../data/sleep-mock-data');
 
-let sleep, userRepo, user, userInfo, userSleepData, data;
+let sleep, userRepo, userSleepData, data;
 
 beforeEach(() => {
   userSleepData = sleepData.filter(data => data.userID === 2);
   data = {
     users: [{
-        "id": 2,
-        "name": "Jarvis Considine",
-        "address": "30086 Kathryn Port, Ciceroland NE 07273",
-        "email": "Dimitri.Bechtelar11@gmail.com",
-        "strideLength": 4.5,
-        "dailyStepGoal": 5000,
-        "friends": [
-          9,
-          18,
-          24,
-          19
-        ]
-      }],
+      "id": 2,
+      "name": "Jarvis Considine",
+      "address": "30086 Kathryn Port, Ciceroland NE 07273",
+      "email": "Dimitri.Bechtelar11@gmail.com",
+      "strideLength": 4.5,
+      "dailyStepGoal": 5000,
+      "friends": [
+        9,
+        18,
+        24,
+        19
+      ]
+    }],
     hydration: [],
     sleep: userSleepData,
     activity: []
@@ -75,7 +75,7 @@ describe("Sleep", () => {
 
   it("should can show parts of sleep quality", () => {
     sleep.updateInfo(userRepo);
-    expect(sleep.splitQuality()).to.deep.equal([4,6]);
+    expect(sleep.splitQuality()).to.deep.equal([ 4, 6 ]);
   });
 
   describe("changeDate method", () => {

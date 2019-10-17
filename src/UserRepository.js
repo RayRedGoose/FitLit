@@ -76,7 +76,11 @@ class UserRepository {
     return this.sleepUsersData.reduce((sleepQualities, data) => {
       if (week.includes(data.date)) {
         const quality = data.sleepQuality / 7;
-        (!sleepQualities[data.userID - 1]) ? sleepQualities[data.userID - 1] = quality : sleepQualities[data.userID - 1]+=quality;
+        if (!sleepQualities[data.userID - 1]) {
+          sleepQualities[data.userID - 1] = quality
+        } else {
+          sleepQualities[data.userID - 1] += quality;
+        }
       }
       return sleepQualities;
     }, []);

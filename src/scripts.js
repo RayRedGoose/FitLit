@@ -20,29 +20,8 @@ $(document).ready(function() {
     $('.board').css('display', 'flex');
     $('.statistic').show();
     createUser();
-    fillUserInfo();
-    getFriends();
-    setChallengeWidget();
-    showHydration();
-    showSleep();
-    showActivity();
+    fillBoard();
     activity.findHighestStreak(userRepository);
-  });
-
-  // LOG OUT FUNCTIONALLITY
-  $('.log-out').on('click', function() {
-    location.reload();
-  });
-
-  // BIO INFO SHOWING
-  $('.bio-info').on('click', function () {
-    $('.bio-info main').fadeToggle();
-  });
-
-  // STEP GOAL SHOWING
-  $('.steps-goal footer p').on('click', function() {
-    $('.steps-goal .average').fadeToggle();
-    $(this).text($(this).text() === 'see average' ? 'close' : 'see average');
   });
 
   function createUser() {
@@ -52,35 +31,13 @@ $(document).ready(function() {
     hydration = new Hydration(userRepository);
   }
 
-  $('.compare').on('click', function() {
-    let $value = $(this).parents('.widget').find('header .dropdown input').val();
-    $('.compare-block').fadeToggle();
-    $(this).text($(this).text() === 'compare with others' ? 'close' : 'compare with others');
-    const $data = getActivityInfo($value)
-    updateAllUserActivity($data);
-  });
-
-  function getActivityInfo(value) {
-    let $data = {};
-    switch (value) {
-      case 'Today':
-        $data.steps = userRepository.findAverageActivityValueForToday('numSteps');
-        $data.flights = userRepository.findAverageActivityValueForToday('flightsOfStairs');
-        $data.mins = userRepository.findAverageActivityValueForToday('minutesActive');
-        break;
-      case 'All time':
-        $data.steps = userRepository.findAverageActivityValue('numSteps');
-        $data.flights = userRepository.findAverageActivityValue('flightsOfStairs');
-        $data.mins = userRepository.findAverageActivityValue('minutesActive');
-        break;
-    }
-    return $data;
-  }
-
-  function updateAllUserActivity(data) {
-    $('.compare-block .steps').text(data.steps);
-    $('.compare-block .flights').text(data.flights);
-    $('.compare-block .mins').text(data.mins);
+  function fillBoard() {
+    fillUserInfo();
+    getFriends();
+    setChallengeWidget();
+    showHydration();
+    showSleep();
+    showActivity();
   }
 
   function fillUserInfo() {
@@ -105,16 +62,16 @@ $(document).ready(function() {
   function setChallengeWidget() {
     const $challengeFriends = user.findFriends(userRepository);
     let activityNew = new Activity(userRepository);
-    let friendOneAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[0].id);
-    let friendTwoAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[1].id);
-    let youChallengerAmount = activityNew.getWeekTotal(userRepository.activityUsersData, user.id);
-    let winner = activityNew.findStepWinner(youChallengerAmount, $challengeFriends[0].name, friendOneAmount, $challengeFriends[1].name, friendTwoAmount)
+    let $friendOneAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[0].id);
+    let $friendTwoAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[1].id);
+    let $youChallengerAmount = activityNew.getWeekTotal(userRepository.activityUsersData, user.id);
+    let $winner = activityNew.findStepWinner($youChallengerAmount, $challengeFriends[0].name, $friendOneAmount, $challengeFriends[1].name, $friendTwoAmount)
     $('.friend1-challenge').text($challengeFriends[0].name);
     $('.friend2-challenge').text($challengeFriends[1].name);
-    $('.friend1-challenge-steps').text(friendOneAmount);
-    $('.friend2-challenge-steps').text(friendTwoAmount);
-    $('.you-challenge-steps').text(youChallengerAmount);
-    $('.step-winner').text(winner);
+    $('.friend1-challenge-steps').text($friendOneAmount);
+    $('.friend2-challenge-steps').text($friendTwoAmount);
+    $('.you-challenge-steps').text($youChallengerAmount);
+    $('.step-winner').text($winner);
   }
 
   function showHydration() {
@@ -145,13 +102,13 @@ $(document).ready(function() {
     $star.attr('src', '../images/star-full.svg');
     $star.prevAll().attr('src', '../images/star-full.svg');
     $star.siblings('p').text(quality.join('.'));
-    if (quality[1] < 5) { 
+    if (quality[1] < 5) {
       changeStar($star, 'halfless');
     }
-    if (quality[1] > 5) { 
+    if (quality[1] > 5) {
       changeStar($star, 'halfmore');
     }
-    if (quality[1] === 5) { 
+    if (quality[1] === 5) {
       changeStar($star, 'half');
     }
   }
@@ -175,8 +132,24 @@ $(document).ready(function() {
     $('.activity-widget').find('.miles').text($miles);
   }
 
+  // LOG OUT FUNCTIONALLITY
+  $('.log-out').on('click', function() {
+    location.reload();
+  });
+
+  // BIO INFO SHOWING
+  $('.bio-info').on('click', function () {
+    $('.bio-info main').fadeToggle();
+  });
+
+  // STEP GOAL SHOWING
+  $('.steps-goal footer p').on('click', function() {
+    $('.steps-goal .average').fadeToggle();
+    $(this).text($(this).text() === 'see average' ? 'close' : 'see average');
+  });
+
   // WEEK DAYS SWITCHER
-  $('.dayly-show footer img').on('click', function() {
+  $('.widget footer img').on('click', function() {
     const $widgetType = $(this).closest('.widget').attr('data-type');
     const $dayIndex = parseInt($(this).attr('data-index'));
     $(this).attr('src', '../images/circle-clicked.svg').siblings().attr('src', '../images/circle.svg');
@@ -297,12 +270,13 @@ $(document).ready(function() {
         updateActivity();
         break;
       case 'water':
-        let allAvg = hydration.calcAvgFluidConsumption(userRepository.hydrationUsersData);
-        $('.current-hydro').text(allAvg);
+        let $allAvg = hydration.calcAvgFluidConsumption(userRepository.hydrationUsersData);
+        $('.current-hydro').text($allAvg);
         break;
     }
   }
 
+  // DATE SEARCH
   $('.search label').on('click', function() {
     $('.alert').text('');
     $(this).parent().children().toggle();
@@ -320,7 +294,10 @@ $(document).ready(function() {
     if (userRepository.validateDate($dayEntered)) {
       showInfoForChosenDate($dayEntered, $widgetType, $dropdown);
     } else {
-      $(this).closest('.widget').find('.alert').text('Enter a valid date!').css('color', '#af4040');
+      $(this).closest('.widget').find('.alert').text('Enter a valid date!').css('color', '#af4040').show();
+      setTimeout(function() {
+        $('.alert').fadeOut();
+      }, 1500);
     }
     $(this).siblings('input').val('');
   });
@@ -328,7 +305,6 @@ $(document).ready(function() {
   function showInfoForChosenDate(day, widget, menu) {
     menu.children('header').children('p').text(day);
     menu.children('input').text(day);
-    $('.compare-block, .compare').hide();
     showInfoForThisDay(day, widget);
   }
 
@@ -339,6 +315,7 @@ $(document).ready(function() {
         updateSleep();
         break;
       case 'activity':
+        $('.compare-block, .compare').hide();
         activity.changeDate(userRepository, day);
         updateActivity();
         break;
@@ -350,18 +327,47 @@ $(document).ready(function() {
     }
   }
 
+  // COMPARE WITH OTHER USERS
+  $('.compare').on('click', function() {
+    let $value = $(this).parents('.widget').find('header .dropdown input').val();
+    $('.compare-block').fadeToggle();
+    $(this).text($(this).text() === 'compare with others' ? 'close' : 'compare with others');
+    const $data = getActivityInfo($value)
+    updateAllUserActivity($data);
+  });
+
+  function getActivityInfo(value) {
+    let $data = {};
+    switch (value) {
+      case 'Today':
+        $data.steps = userRepository.findAverageActivityValueForToday('numSteps');
+        $data.flights = userRepository.findAverageActivityValueForToday('flightsOfStairs');
+        $data.mins = userRepository.findAverageActivityValueForToday('minutesActive');
+        break;
+      case 'All time':
+        $data.steps = userRepository.findAverageActivityValue('numSteps');
+        $data.flights = userRepository.findAverageActivityValue('flightsOfStairs');
+        $data.mins = userRepository.findAverageActivityValue('minutesActive');
+        break;
+    }
+    return $data;
+  }
+
+  function updateAllUserActivity(data) {
+    $('.compare-block .steps').text(data.steps);
+    $('.compare-block .flights').text(data.flights);
+    $('.compare-block .mins').text(data.mins);
+  }
+
+  // STATISTIC BLOCK
   $('.statistic>header').on('click', function() {
     $(this).hide();
     $('.statistic').css('height', '100%');
     $('.statistic main').show();
-    updateStreaks();
+    if ($(this).hasClass('first')) {
+      updateStreaks();
+    }
     updateHighest();
-  });
-
-  $('.closer-stats').on('click', function () {
-    $('.statistic header').show();
-    $('.statistic').css('height', '7%');
-    $('.statistic main').hide();
   });
 
   function updateStreaks() {
@@ -371,6 +377,7 @@ $(document).ready(function() {
     $allStreaks.forEach(streak => {
       $('.statistic footer').append(`<p class='tiny'>${streak.streak} days in row</p><p>${streak.period}</p>`);
     });
+    $('.statistic>header').removeClass('first');
   }
 
   function updateHighest() {
@@ -394,8 +401,16 @@ $(document).ready(function() {
     const $water = hydration.findHighestFluid(userRepository.hydrationUsersData);
     $('.highest .water .water-number').text($water);
   }
+
   function updateHighestSleep() {
     const $sleep = sleep.findHighestSleep(userRepository);
     $('.highest .sleep .sleep-number').text($sleep);
   }
+
+  $('.closer-stats').on('click', function () {
+    $('.statistic header').show();
+    $('.statistic').css('height', '7%');
+    $('.statistic main').hide();
+  });
+
 });
