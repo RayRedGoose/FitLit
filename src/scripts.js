@@ -294,7 +294,10 @@ $(document).ready(function() {
     if (userRepository.validateDate($dayEntered)) {
       showInfoForChosenDate($dayEntered, $widgetType, $dropdown);
     } else {
-      $(this).closest('.widget').find('.alert').text('Enter a valid date!').css('color', '#af4040');
+      $(this).closest('.widget').find('.alert').text('Enter a valid date!').css('color', '#af4040').show();
+      setTimeout(function() {
+        $('.alert').fadeOut();
+      }, 1500);
     }
     $(this).siblings('input').val('');
   });
