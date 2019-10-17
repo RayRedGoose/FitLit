@@ -2,7 +2,7 @@
   background-color: rgba(255, 255, 255, 0.8)
   border-radius: 40px
   display: none
-  position: absolute
+  position: fixed
   right: 0
   bottom: 0
   height: 7%
@@ -10,11 +10,12 @@
   &>header
     background-color: rgba(255, 255, 255, 0.2)
     border-radius: 20px 20px 0 0
-    color: $numbers-color
+    color: $background-color
     cursor: pointer
     display: block
     padding: 15px
     text-align: center
+    text-transform: capitalize
     &:hover
       background-color: $hover-color
   &>main
@@ -31,14 +32,9 @@
       display: block
       position: relative
       p
-        border-radius: 20px
-        cursor: pointer
-        padding: 5px 20px
         position: absolute
         top: 5px
         right: 0
-        &:hover
-          background-color: $hover-color
     &>main
       display: flex
 
