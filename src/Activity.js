@@ -26,11 +26,11 @@ class Activity {
     if (dayData) {
       this.numSteps = dayData.numSteps;
       this.minutesActive = dayData.minutesActive;
-      this.flightsOfStairs= dayData.flightsOfStairs;
+      this.flightsOfStairs = dayData.flightsOfStairs;
     } else {
       this.numSteps = 0;
       this.minutesActive = 0;
-      this.flightsOfStairs= 0;
+      this.flightsOfStairs = 0;
     }
   }
 
@@ -71,7 +71,7 @@ class Activity {
       avr.minutesActive += data.minutesActive / 7;
       avr.flightsOfStairs += data.flightsOfStairs / 7;
       return avr;
-    }, {numSteps: 0, minutesActive: 0, flightsOfStairs:0});
+    }, {numSteps: 0, minutesActive: 0, flightsOfStairs: 0});
     this.numSteps = parseInt(average.numSteps);
     this.minutesActive = parseInt(average.minutesActive);
     this.flightsOfStairs = parseInt(average.flightsOfStairs);
@@ -109,7 +109,7 @@ class Activity {
         days[counter].push(data);
       } else {
         counter ++;
-        days[counter] =[data];
+        days[counter] = [data];
       }
       return days;
     }, []).filter(days => days.length > 3);
@@ -130,6 +130,24 @@ class Activity {
   findHighestStreak(userRepo) {
     const streaks = this.findStreaks(userRepo);
     return streaks[streaks.length - 1].streak;
+  }
+
+  findHighestValue(userRepo, user, info) {
+    const dataset = userRepo.activityUsersData.filter(data => data.userID === this.userID);
+    const highests = dataset.reduce((list, data) => {
+      if (data.numSteps > list.numSteps) {
+        list.numSteps = data.numSteps;
+        list.miles = parseInt(list.numSteps * user.strideLength / 5280);
+      }
+      if (data.minutesActive > list.minutesActive) {
+        list.minutesActive = data.minutesActive;
+      }
+      if (data.flightsOfStairs > list.flightsOfStairs) {
+        list.flightsOfStairs = data.flightsOfStairs;
+      }
+      return list;
+    }, {numSteps: 0, miles: 0, minutesActive: 0, flightsOfStairs: 0});
+    return highests[info]
   }
 }
 

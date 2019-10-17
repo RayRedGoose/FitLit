@@ -61,14 +61,24 @@ class Sleep {
       case 'hours':
         return Math.round(dataset.reduce((sum, data) => {
           const num = data.hoursSlept / dataset.length;
-          return sum+=num;
+          return sum += num;
         }, 0) * 10) / 10;
       case 'quality':
         return Math.round(dataset.reduce((sum, data) => {
           const num = data.sleepQuality / dataset.length;
-          return sum+=num;
+          return sum += num;
         }, 0) * 10) / 10;
     }
+  }
+
+  findHighestSleep(userRepo) {
+    let dataset = userRepo.sleepUsersData.filter(data => data.userID === this.userID);
+    return dataset.reduce((num, data) => {
+      if (data.hoursSlept > num) {
+        num = data.hoursSlept
+      }
+      return num;
+    }, 0);
   }
 }
 

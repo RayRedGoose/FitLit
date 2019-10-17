@@ -2,7 +2,6 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const Hydration = require('../src/Hydration');
-const UserRepository = require('../src/UserRepository');
 
 
 describe('Hydration', function() {
@@ -94,5 +93,11 @@ describe('Hydration', function() {
     const hydration = new Hydration(mockUserRepo);
 
     expect(hydration.findWeeksFluid(mockData.hydration)).to.have.lengthOf(7);
+  })
+
+  it("should show highest number of ounces", () => {
+    const hydration = new Hydration(mockUserRepo);
+    const ounces = hydration.findHighestFluid(mockData.hydration);
+    expect(ounces).to.equal(37);
   })
 })
