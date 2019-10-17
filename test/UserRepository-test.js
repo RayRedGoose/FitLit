@@ -18,42 +18,27 @@ const data = {
       8
     ]
   }, {
-      "id": 2,
-      "name": "Jarvis Considine",
-      "address": "30086 Kathryn Port, Ciceroland NE 07273",
-      "email": "Dimitri.Bechtelar11@gmail.com",
-      "strideLength": 4.5,
-      "dailyStepGoal": 5000,
-      "friends": [
-        9,
-        18,
-        24,
-        19
-      ]
-    }],
+    "id": 2,
+    "name": "Jarvis Considine",
+    "address": "30086 Kathryn Port, Ciceroland NE 07273",
+    "email": "Dimitri.Bechtelar11@gmail.com",
+    "strideLength": 4.5,
+    "dailyStepGoal": 5000,
+    "friends": [
+      9,
+      18,
+      24,
+      19
+    ]}],
   hydration: [],
   sleep: sleepData,
   activity: activityData
 };
 
-let userRepository, user;
+let userRepository;
 
 beforeEach(() => {
   userRepository = new UserRepository(data);
-  user = {
-      "id": 2,
-      "name": "Jarvis Considine",
-      "address": "30086 Kathryn Port, Ciceroland NE 07273",
-      "email": "Dimitri.Bechtelar11@gmail.com",
-      "strideLength": 4.5,
-      "dailyStepGoal": 5000,
-      "friends": [
-        9,
-        18,
-        24,
-        19
-      ]
-    };
   userRepository.currentUserId = 2;
 })
 
@@ -80,19 +65,19 @@ describe("UserRepository", () => {
         8
       ]
     }, {
-        "id": 2,
-        "name": "Jarvis Considine",
-        "address": "30086 Kathryn Port, Ciceroland NE 07273",
-        "email": "Dimitri.Bechtelar11@gmail.com",
-        "strideLength": 4.5,
-        "dailyStepGoal": 5000,
-        "friends": [
-          9,
-          18,
-          24,
-          19
-        ]
-      }]);
+      "id": 2,
+      "name": "Jarvis Considine",
+      "address": "30086 Kathryn Port, Ciceroland NE 07273",
+      "email": "Dimitri.Bechtelar11@gmail.com",
+      "strideLength": 4.5,
+      "dailyStepGoal": 5000,
+      "friends": [
+        9,
+        18,
+        24,
+        19
+      ]
+    }]);
   });
 
   it('should keep current user ID', function() {
@@ -131,7 +116,15 @@ describe("UserRepository", () => {
   it('should can find week', function() {
     userRepository.findToday();
     const week = userRepository.getWeekDates(userRepository.day);
-    expect(week).to.deep.equal(["2019/09/16","2019/09/17","2019/09/18","2019/09/19","2019/09/20","2019/09/21","2019/09/22"]);
+    expect(week).to.deep.equal([
+      "2019/09/16",
+      "2019/09/17",
+      "2019/09/18",
+      "2019/09/19",
+      "2019/09/20",
+      "2019/09/21",
+      "2019/09/22"
+    ]);
   });
 
   it('should can find people who sleep well this week', function() {
