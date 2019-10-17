@@ -145,13 +145,13 @@ $(document).ready(function() {
     $star.attr('src', '../images/star-full.svg');
     $star.prevAll().attr('src', '../images/star-full.svg');
     $star.siblings('p').text(quality.join('.'));
-    if (quality[1] < 5) { 
+    if (quality[1] < 5) {
       changeStar($star, 'halfless');
     }
-    if (quality[1] > 5) { 
+    if (quality[1] > 5) {
       changeStar($star, 'halfmore');
     }
-    if (quality[1] === 5) { 
+    if (quality[1] === 5) {
       changeStar($star, 'half');
     }
   }
@@ -176,7 +176,7 @@ $(document).ready(function() {
   }
 
   // WEEK DAYS SWITCHER
-  $('.dayly-show footer img').on('click', function() {
+  $('.widget footer img').on('click', function() {
     const $widgetType = $(this).closest('.widget').attr('data-type');
     const $dayIndex = parseInt($(this).attr('data-index'));
     $(this).attr('src', '../images/circle-clicked.svg').siblings().attr('src', '../images/circle.svg');
