@@ -131,6 +131,24 @@ class Activity {
     const streaks = this.findStreaks(userRepo);
     return streaks[streaks.length - 1].streak;
   }
+
+  findHighestValue(userRepo, user, info) {
+    const dataset = userRepo.activityUsersData.filter(data => data.userID === this.userID);
+    const highests = dataset.reduce((list, data) => {
+      if (data.numSteps > list.numSteps) {
+        list.numSteps = data.numSteps;
+        list.miles = parseInt(list.numSteps * user.strideLength / 5280);
+      }
+      if (data.minutesActive > list.minutesActive) {
+        list.minutesActive = data.minutesActive;
+      }
+      if (data.flightsOfStairs > list.flightsOfStairs) {
+        list.flightsOfStairs = data.flightsOfStairs;
+      }
+      return list;
+    }, {numSteps: 0, miles: 0, minutesActive: 0, flightsOfStairs: 0});
+    return highests[info]
+  }
 }
 
 if (typeof module !== 'undefined') {
