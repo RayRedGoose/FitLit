@@ -305,7 +305,6 @@ $(document).ready(function() {
   function showInfoForChosenDate(day, widget, menu) {
     menu.children('header').children('p').text(day);
     menu.children('input').text(day);
-    $('.compare-block, .compare').hide();
     showInfoForThisDay(day, widget);
   }
 
@@ -316,6 +315,7 @@ $(document).ready(function() {
         updateSleep();
         break;
       case 'activity':
+        $('.compare-block, .compare').hide();
         activity.changeDate(userRepository, day);
         updateActivity();
         break;
@@ -364,7 +364,9 @@ $(document).ready(function() {
     $(this).hide();
     $('.statistic').css('height', '100%');
     $('.statistic main').show();
-    updateStreaks();
+    if ($(this).hasClass('first')) {
+      updateStreaks();
+    }
     updateHighest();
   });
 
@@ -375,6 +377,7 @@ $(document).ready(function() {
     $allStreaks.forEach(streak => {
       $('.statistic footer').append(`<p class='tiny'>${streak.streak} days in row</p><p>${streak.period}</p>`);
     });
+    $('.statistic>header').removeClass('first');
   }
 
   function updateHighest() {
