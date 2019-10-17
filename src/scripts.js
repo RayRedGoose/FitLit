@@ -5,8 +5,6 @@ const data = {
   activity: activityData
 }
 
-
-
 const userRepository = new UserRepository(data);
 userRepository.findToday();
 let user;
@@ -22,12 +20,7 @@ $(document).ready(function() {
     $('.board').css('display', 'flex');
     $('.statistic').show();
     createUser();
-    fillUserInfo();
-    getFriends();
-    setChallengeWidget();
-    showHydration();
-    showSleep();
-    showActivity();
+    fillBoard();
     activity.findHighestStreak(userRepository);
   });
 
@@ -47,13 +40,57 @@ $(document).ready(function() {
     $(this).text($(this).text() === 'see average' ? 'close' : 'see average');
   });
 
-  function createUser() {
-    const $nameGiven = `${$('.first-name').val()} ${$('.last-name').val()}`;
-    const $currentUser = userRepository.findUserByName($nameGiven);
-    user = new User($currentUser);
-    hydration = new Hydration(userRepository);
-  }
+  // WEEK DAYS SWITCHER
+  $('.widget footer img').on('click', function() {
+    const $widgetType = $(this).closest('.widget').attr('data-type');
+    const $dayIndex = parseInt($(this).attr('data-index'));
+    $(this).attr('src', '../images/circle-clicked.svg').siblings().attr('src', '../images/circle.svg');
+    if ($widgetType === 'sleep') { updateSleepWeekDay(this, $dayIndex); }
+    if ($widgetType === 'activity') { updateActiveWeekDay(this, $dayIndex); }
+    if ($widgetType === 'water') { updateHydrationWeekDay(this, $dayIndex); }
+  });
 
+  // DROPDOWN MENU SCRIPTS
+  $('.dropdown header').on('click', function() {
+    $(this).siblings('div').toggle();
+  });
+
+  $('.dropdown div p').on('click', function() {
+    $('.alert').text('');
+    $(this).parent().siblings('header').children('p').text($(this).text());
+    $(this).parent().siblings('input').val($(this).text());
+    $(this).parent().hide();
+    $(this).closest('.widget').find('footer .last').attr('src', '../images/circle-clicked.svg').siblings().attr('src', '../images/circle.svg');
+    switchDays(this);
+  });
+
+  // DATE SEARCHER
+  $('.search label').on('click', function() {
+    $('.alert').text('');
+    $(this).parent().children().toggle();
+    $(this).parent().siblings('.dropdown').toggle();
+  });
+
+  $('.search button').on('click', function() {
+    const $widgetType = $(this).closest('.widget').attr('data-type');
+    const $dayEntered = $(this).siblings('input').val();
+    const $dropdown = $(this).parent().siblings('.dropdown');
+    $(this).parent().children().toggle();
+    $dropdown.toggle();
+    $dropdown.children('div').hide();
+    $(this).closest('.widget').find('.date, footer').hide();
+    if (userRepository.validateDate($dayEntered)) {
+      showInfoForChosenDate($dayEntered, $widgetType, $dropdown);
+    } else {
+      $(this).closest('.widget').find('.alert').text('Enter a valid date!').css('color', '#af4040').show();
+      setTimeout(function() {
+        $('.alert').fadeOut();
+      }, 1500);
+    }
+    $(this).siblings('input').val('');
+  });
+
+  // COMPARE WITH OTHER USERS
   $('.compare').on('click', function() {
     $value = $(this).parents('.widget').find('header .dropdown input').val();
     $('.compare-block').fadeToggle();
@@ -62,27 +99,35 @@ $(document).ready(function() {
     updateAllUserActivity($data);
   });
 
-  function getActivityInfo(value) {
-    let $data = {};
-    switch (value) {
-      case 'Today':
-        $data.steps = userRepository.findAverageActivityValueForToday('numSteps');
-        $data.flights = userRepository.findAverageActivityValueForToday('flightsOfStairs');
-        $data.mins = userRepository.findAverageActivityValueForToday('minutesActive');
-        break;
-      case 'All time':
-        $data.steps = userRepository.findAverageActivityValue('numSteps');
-        $data.flights = userRepository.findAverageActivityValue('flightsOfStairs');
-        $data.mins = userRepository.findAverageActivityValue('minutesActive');
-        break;
-    }
-    return $data;
+  // STATISTICS BLOCK
+  $('.statistic>header').on('click', function() {
+    $(this).hide();
+    $('.statistic').css('height', '100%');
+    $('.statistic main').show();
+    if($(this).hasClass('start')) { updateStreaks(); }
+    $(this).removeClass('start');
+  });
+
+  $('.closer-stats').on('click', function () {
+    $('.statistic header').show();
+    $('.statistic').css('height', '7%');
+    $('.statistic main').hide();
+  });
+
+  function createUser() {
+    const $nameGiven = `${$('.first-name').val()} ${$('.last-name').val()}`;
+    const $currentUser = userRepository.findUserByName($nameGiven);
+    user = new User($currentUser);
+    hydration = new Hydration(userRepository);
   }
 
-  function updateAllUserActivity(data) {
-    $('.compare-block .steps').text(data.steps);
-    $('.compare-block .flights').text(data.flights);
-    $('.compare-block .mins').text(data.mins);
+  function fillBoard() {
+    fillUserInfo();
+    getFriends();
+    showHydration();
+    showSleep();
+    showActivity();
+    setChallengeWidget();
   }
 
   function fillUserInfo() {
@@ -102,27 +147,6 @@ $(document).ready(function() {
       <h5>${friend.name}</h5>
       <p>step goal: ${friend.dailyStepGoal}</p>`);
     })
-  }
-
-  // function showStepComp() {
-  //   activity = new Activity(userRepository);
-  //   activity.getWeekTotal(userRepository.activityData, );
-  // }
-
-  function setChallengeWidget() {
-    const $challengeFriends = user.findFriends(userRepository);
-    let activityNew = new Activity(userRepository);
-    let friendOneAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[0].id);
-    let friendTwoAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[1].id);
-    let youChallengerAmount = activityNew.getWeekTotal(userRepository.activityUsersData, user.id);
-    let winner = activityNew.findStepWinner(youChallengerAmount, $challengeFriends[0].name, friendOneAmount, $challengeFriends[1].name, friendTwoAmount)
-    $('.friend1-challenge').text($challengeFriends[0].name);
-    $('.friend2-challenge').text($challengeFriends[1].name);
-    $('.friend1-challenge-steps').text(friendOneAmount);
-    $('.friend2-challenge-steps').text(friendTwoAmount);
-    $('.you-challenge-steps').text(youChallengerAmount);
-    $('.step-winner').text(winner);
-
   }
 
   function showHydration() {
@@ -177,15 +201,21 @@ $(document).ready(function() {
     $('.activity-widget').find('.miles').text($miles);
   }
 
-  // WEEK DAYS SWITCHER
-  $('.dayly-show footer img').on('click', function() {
-    const $widgetType = $(this).closest('.widget').attr('data-type');
-    const $dayIndex = parseInt($(this).attr('data-index'));
-    $(this).attr('src', '../images/circle-clicked.svg').siblings().attr('src', '../images/circle.svg');
-    if ($widgetType === 'sleep') { updateSleepWeekDay(this, $dayIndex); }
-    if ($widgetType === 'activity') { updateActiveWeekDay(this, $dayIndex); }
-    if ($widgetType === 'water') { updateHydrationWeekDay(this, $dayIndex); }
-  });
+  function setChallengeWidget() {
+    const $challengeFriends = user.findFriends(userRepository);
+    let activityNew = new Activity(userRepository);
+    let friendOneAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[0].id);
+    let friendTwoAmount = activityNew.getWeekTotal(userRepository.activityUsersData, $challengeFriends[1].id);
+    let youChallengerAmount = activityNew.getWeekTotal(userRepository.activityUsersData, user.id);
+    let winner = activityNew.findStepWinner(youChallengerAmount, $challengeFriends[0].name, friendOneAmount, $challengeFriends[1].name, friendTwoAmount)
+    $('.friend1-challenge').text($challengeFriends[0].name);
+    $('.friend2-challenge').text($challengeFriends[1].name);
+    $('.friend1-challenge-steps').text(friendOneAmount);
+    $('.friend2-challenge-steps').text(friendTwoAmount);
+    $('.you-challenge-steps').text(youChallengerAmount);
+    $('.step-winner').text(winner);
+
+  }
 
   function updateSleepWeekDay(target, index) {
     const $weekInfo = sleep.getWeekFullInfo(userRepository);
@@ -210,19 +240,53 @@ $(document).ready(function() {
     $(target).closest('.widget').find('.section__number').text($weekInfo[index].numOunces);
   }
 
-  // DROPDOWN MENU SCRIPTS
-  $('.dropdown header').on('click', function() {
-    $(this).siblings('div').toggle();
-  });
+  function getActivityInfo(value) {
+    let $data = {};
+    switch (value) {
+      case 'Today':
+        $data.steps = userRepository.findAverageActivityValueForToday('numSteps');
+        $data.flights = userRepository.findAverageActivityValueForToday('flightsOfStairs');
+        $data.mins = userRepository.findAverageActivityValueForToday('minutesActive');
+        break;
+      case 'All time':
+        $data.steps = userRepository.findAverageActivityValue('numSteps');
+        $data.flights = userRepository.findAverageActivityValue('flightsOfStairs');
+        $data.mins = userRepository.findAverageActivityValue('minutesActive');
+        break;
+    }
+    return $data;
+  }
 
-  $('.dropdown div p').on('click', function() {
-    $('.alert').text('');
-    $(this).parent().siblings('header').children('p').text($(this).text());
-    $(this).parent().siblings('input').val($(this).text());
-    $(this).parent().hide();
-    $(this).closest('.widget').find('footer .last').attr('src', '../images/circle-clicked.svg').siblings().attr('src', '../images/circle.svg');
-    switchDays(this);
-  });
+  function showInfoForChosenDate(day, widget, menu) {
+    menu.children('header').children('p').text(day);
+    menu.children('input').text(day);
+    $('.compare-block, .compare').hide();
+    showInfoForThisDay(day, widget);
+  }
+
+  function showInfoForThisDay(day, widget) {
+    switch (widget) {
+      case 'sleep':
+        sleep.changeDate(userRepository, day);
+        updateSleep();
+        break;
+      case 'activity':
+        activity.changeDate(userRepository, day);
+        updateActivity();
+        break;
+      case 'water':
+        hydration.date = day;
+        $dayFluid = hydration.findDayFluid(userRepository.hydrationUsersData)
+        $('.current-hydro').text($dayFluid);
+        break;
+    }
+  }
+
+  function updateAllUserActivity(data) {
+    $('.compare-block .steps').text(data.steps);
+    $('.compare-block .flights').text(data.flights);
+    $('.compare-block .mins').text(data.mins);
+  }
 
   function switchDays(target) {
     const $widgetType = $(target).closest('.widget').attr('data-type');
@@ -280,7 +344,8 @@ $(document).ready(function() {
   }
 
   function startActivityForAll(widget, target) {
-    $(target).closest('.widget').find('.date, footer').hide();
+    $(target).closest('.widget').find('.date').show().text('average');
+    $(target).closest('.widget').find('footer').hide();
     switch (widget) {
       case 'sleep':
         sleep.changeDate(userRepository, 'All time');
@@ -299,60 +364,6 @@ $(document).ready(function() {
     }
   }
 
-  $('.search label').on('click', function() {
-    $('.alert').text('');
-    $(this).parent().children().toggle();
-    $(this).parent().siblings('.dropdown').toggle();
-  });
-
-  $('.search button').on('click', function() {
-    const $widgetType = $(this).closest('.widget').attr('data-type');
-    const $dayEntered = $(this).siblings('input').val();
-    const $dropdown = $(this).parent().siblings('.dropdown');
-    $(this).parent().children().toggle();
-    $dropdown.toggle();
-    $dropdown.children('div').hide();
-    $(this).closest('.widget').find('.date, footer').hide();
-    if (userRepository.validateDate($dayEntered)) {
-      showInfoForChosenDate($dayEntered, $widgetType, $dropdown);
-    } else {
-      $(this).closest('.widget').find('.alert').text('Enter a valid date!').css('color', '#af4040');
-    }
-    $(this).siblings('input').val('');
-  });
-
-  function showInfoForChosenDate(day, widget, menu) {
-    menu.children('header').children('p').text(day);
-    menu.children('input').text(day);
-    $('.compare-block, .compare').hide();
-    showInfoForThisDay(day, widget);
-  }
-
-  function showInfoForThisDay(day, widget) {
-    switch (widget) {
-      case 'sleep':
-        sleep.changeDate(userRepository, day);
-        updateSleep();
-        break;
-      case 'activity':
-        activity.changeDate(userRepository, day);
-        updateActivity();
-        break;
-      case 'water':
-        hydration.date = day;
-        $dayFluid = hydration.findDayFluid(userRepository.hydrationUsersData)
-        $('.current-hydro').text($dayFluid);
-        break;
-    }
-  }
-
-  $('.statistic>header').on('click', function() {
-    $(this).hide();
-    $('.statistic').css('height', '100%');
-    $('.statistic main').show();
-    updateStreaks();
-  });
-
   function updateStreaks() {
     const $streakHighest = activity.findHighestStreak(userRepository);
     const $allStreaks = activity.findStreaks(userRepository);
@@ -362,9 +373,4 @@ $(document).ready(function() {
     });
   }
 
-  $('.closer-stats').on('click', function () {
-    $('.statistic header').show();
-    $('.statistic').css('height', '7%');
-    $('.statistic main').hide();
-  });
 });
