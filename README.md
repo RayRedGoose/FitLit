@@ -1,4 +1,7 @@
-# FitLit Starter Kit
+# FitLit 
+
+## Authors
+Benjamin Firth and Raisa Primerova
 
 The details of this project are outline in [this project spec](http://frontend.turing.io/projects/fitlit.html).
 
@@ -8,6 +11,5 @@ FitLit is a fitness program for tracking activity. Fitbit devices log data and p
 
 ![FitLit functionality](/images/app.gif)
 
-## Authors
 
-Benjamin Firth and Raisa Primerova
+
